@@ -1,0 +1,319 @@
+Lab objectives
+In this lab, you learn how to perform the following tasks:
+
+Write and deploy several Background Cloud Functions.
+
+Upload images to Cloud Storage.
+
+Extract, translate and save text contained in uploaded images.
+
+Task 0. Setup and requirements
+For each lab, you get a new Google Cloud project and set of resources for a fixed time at no cost.
+
+Sign in to Qwiklabs using an incognito window.
+
+Note the lab's access time (for example, 1:15:00), and make sure you can finish within that time.
+There is no pause feature. You can restart if needed, but you have to start at the beginning.
+
+When ready, click Start lab.
+
+Note your lab credentials (Username and Password). You will use them to sign in to the Google Cloud Console.
+
+Click Open Google Console.
+
+Click Use another account and copy/paste credentials for this lab into the prompts.
+If you use other credentials, you'll receive errors or incur charges.
+
+Accept the terms and skip the recovery resource page.
+
+Note: Do not click End Lab unless you have finished the lab or want to restart it. This clears your work and removes the project.
+
+Activate Cloud Shell
+Cloud Shell is a virtual machine that contains development tools. It offers a persistent 5-GB home directory and runs on Google Cloud. Cloud Shell provides command-line access to your Google Cloud resources. gcloud is the command-line tool for Google Cloud. It comes pre-installed on Cloud Shell and supports tab completion.
+
+Click the Activate Cloud Shell button (Activate Cloud Shell icon) at the top right of the console.
+
+Click Continue.
+It takes a few moments to provision and connect to the environment. When you are connected, you are also authenticated, and the project is set to your PROJECT_ID.
+
+Sample commands
+List the active account name:
+
+gcloud auth list
+Copied!
+(Output)
+
+Credentialed accounts:
+ - <myaccount>@<mydomain>.com (active)
+(Example output)
+
+Credentialed accounts:
+ - google1623327_student@qwiklabs.net
+List the project ID:
+
+gcloud config list project
+Copied!
+(Output)
+
+[core]
+project = <project_ID>
+(Example output)
+
+[core]
+project = qwiklabs-gcp-44776a13dea667a6
+Note: Full documentation of gcloud is available in the gcloud CLI overview guide.
+Task 1. Visualize the flow of data
+The flow of data in the Extract Text from the Images using the Google Cloud Vision API lab application involves several steps:
+
+An image that contains text in any language is uploaded to Cloud Storage.
+A Cloud Function is triggered, which uses the Vision API to extract the text and detect the source language.
+The text is queued for translation by publishing a message to a Pub/Sub topic. A translation is queued for each target language different from the source language.
+If a target language matches the source language, the translation queue is skipped, and text is sent to the result queue, another Pub/Sub topic.
+A Cloud Function uses the Translation API to translate the text in the translation queue. The translated result is sent to the result queue.
+Another Cloud Function saves the translated text from the result queue to Cloud Storage.
+The results are found in Cloud Storage as txt files for each translation.
+It may help to visualize the steps:
+
+Visualizing the flow of data
+
+Task 2. Prepare the application
+Copy below script and paste it in the Cloud Shell. Before hitting the enter, change the bucket name (In order to set a unique name use your project ID because it is unique. For example, “image_bucket_YOUR_PROJECT_ID” can be your unique bucket name. Or feel free to choose any name as long as you use only lowercase letters, numbers, hyphens (-), underscores (_) and dots (.))
+
+gsutil mb gs://YOUR_IMAGE_BUCKET_NAME
+Copied!
+Copy below script and paste it in the Cloud Shell. Before hitting the enter, change the bucket name (In order to set a unique name use your project ID because it is unique. For example, “result_bucket_YOUR_PROJECT_ID” can be your unique bucket name. Or feel free to choose any name as long as you use only lowercase letters, numbers, hyphens (-), underscores (_) and dots (.))
+
+gsutil mb gs://YOUR_RESULT_BUCKET_NAME
+Copied!
+Click Check my progress to verify the objective.
+
+Create two cloud storage buckets
+Copy below script and paste it in the Cloud Shell. Before hitting the enter, change YOUR_TRANSLATE_TOPIC_NAME.
+
+gcloud pubsub topics create YOUR_TRANSLATE_TOPIC_NAME
+Copied!
+Copy below script and paste it in the Cloud Shell. Before hitting the enter, change YOUR_RESULT_TOPIC_NAME.
+
+gcloud pubsub topics create YOUR_RESULT_TOPIC_NAME
+Copied!
+Click Check my progress to verify the objective.
+
+Create pubsub topics
+Clone the sample app repository to your Cloud Shell:
+
+git clone https://github.com/GoogleCloudPlatform/python-docs-samples.git
+Copied!
+Change to the directory that contains the Cloud Functions sample code:
+
+cd python-docs-samples/functions/ocr/app/
+Copied!
+python-docs-samples/functions/ocr/app/ folder consists of a main.py file which includes ocr_detect, ocr_process, ocr_translate, ocr_ save and message_validatation_helper functions defined in Task 1. Visualizing the flow of data.
+
+Task 3. Understand the code
+Let’s look at your main.py file a bit closer:
+
+Import dependencies
+The application must import several dependencies in order to communicate with Google Cloud services:
+
+functions/ocr/app/main.py
+
+import base64
+import json
+import os
+from google.cloud import pubsub_v1
+from google.cloud import storage
+from google.cloud import translate_v2 as translate
+from google.cloud import vision
+vision_client = vision.ImageAnnotatorClient()
+translate_client = translate.Client()
+publisher = pubsub_v1.PublisherClient()
+storage_client = storage.Client()
+project_id = os.environ["GCP_PROJECT"]
+Copied!
+Process images
+The following function reads an uploaded image file from Cloud Storage and calls a function to detect whether the image contains text:
+
+functions/ocr/app/main.py
+
+def process_image(file, context):
+    """Cloud Function triggered by Cloud Storage when a file is changed.
+    Args:
+        file (dict): Metadata of the changed file, provided by the triggering
+                                 Cloud Storage event.
+        context (google.cloud.functions.Context): Metadata of triggering event.
+    Returns:
+        None; the output is written to stdout and Stackdriver Logging
+    """
+    bucket = validate_message(file, "bucket")
+    name = validate_message(file, "name")
+    detect_text(bucket, name)
+    print("File {} processed.".format(file["name"]))
+Copied!
+The following function extracts text from the image using the Cloud Vision API and queues the text for translation:
+
+functions/ocr/app/main.py
+
+def detect_text(bucket, filename):
+    print("Looking for text in image {}".format(filename))
+    futures = []
+    image = vision.Image(
+        source=vision.ImageSource(gcs_image_uri=f"gs://{bucket}/{filename}")
+    )
+    text_detection_response = vision_client.text_detection(image=image)
+    annotations = text_detection_response.text_annotations
+    if len(annotations) > 0:
+        text = annotations[0].description
+    else:
+        text = ""
+    print("Extracted text {} from image ({} chars).".format(text, len(text)))
+    detect_language_response = translate_client.detect_language(text)
+    src_lang = detect_language_response["language"]
+    print("Detected language {} for text {}.".format(src_lang, text))
+    # Submit a message to the bus for each target language
+    to_langs = os.environ["TO_LANG"].split(",")
+    for target_lang in to_langs:
+        topic_name = os.environ["TRANSLATE_TOPIC"]
+        if src_lang == target_lang or src_lang == "und":
+            topic_name = os.environ["RESULT_TOPIC"]
+        message = {
+            "text": text,
+            "filename": filename,
+            "lang": target_lang,
+            "src_lang": src_lang,
+        }
+        message_data = json.dumps(message).encode("utf-8")
+        topic_path = publisher.topic_path(project_id, topic_name)
+        future = publisher.publish(topic_path, data=message_data)
+        futures.append(future)
+    for future in futures:
+        future.result()
+Copied!
+Translate text
+The following function translates the extracted text and queues the translated text to be saved back to Cloud Storage:
+
+functions/ocr/app/main.py
+
+def translate_text(event, context):
+    if event.get("data"):
+        message_data = base64.b64decode(event["data"]).decode("utf-8")
+        message = json.loads(message_data)
+    else:
+        raise ValueError("Data sector is missing in the Pub/Sub message.")
+    text = validate_message(message, "text")
+    filename = validate_message(message, "filename")
+    target_lang = validate_message(message, "lang")
+    src_lang = validate_message(message, "src_lang")
+    print("Translating text into {}.".format(target_lang))
+    translated_text = translate_client.translate(
+        text, target_language=target_lang, source_language=src_lang
+    )
+    topic_name = os.environ["RESULT_TOPIC"]
+    message = {
+        "text": translated_text["translatedText"],
+        "filename": filename,
+        "lang": target_lang,
+    }
+    message_data = json.dumps(message).encode("utf-8")
+    topic_path = publisher.topic_path(project_id, topic_name)
+    future = publisher.publish(topic_path, data=message_data)
+    future.result()
+Copied!
+Save the translations
+Finally, the following function receives the translated text and saves it back to Cloud Storage:
+
+functions/ocr/app/main.py
+
+def save_result(event, context):
+    if event.get("data"):
+        message_data = base64.b64decode(event["data"]).decode("utf-8")
+        message = json.loads(message_data)
+    else:
+        raise ValueError("Data sector is missing in the Pub/Sub message.")
+    text = validate_message(message, "text")
+    filename = validate_message(message, "filename")
+    lang = validate_message(message, "lang")
+    print("Received request to save file {}.".format(filename))
+    bucket_name = os.environ["RESULT_BUCKET"]
+    result_filename = "{}_{}.txt".format(filename, lang)
+    bucket = storage_client.get_bucket(bucket_name)
+    blob = bucket.blob(result_filename)
+    print("Saving result to {} in bucket {}.".format(result_filename, bucket_name))
+    blob.upload_from_string(text)
+    print("File saved.")
+Copied!
+Task 4. Deploy the functions
+This task describes how to deploy your functions.
+
+To deploy the image processing function with a Cloud Storage trigger, run the following command in the directory that contains the sample code:
+
+gcloud functions deploy ocr-extract \
+--runtime python39 \
+--trigger-bucket YOUR_IMAGE_BUCKET_NAME \
+--entry-point process_image \
+--set-env-vars "^:^GCP_PROJECT=YOUR_GCP_PROJECT_ID:TRANSLATE_TOPIC=YOUR_TRANSLATE_TOPIC_NAME:RESULT_TOPIC=YOUR_RESULT_TOPIC_NAME:TO_LANG=es,en,fr,ja"
+Copied!
+You can use the following values for the --runtime flag to specify your preferred Python version:
+
+python39 (recommended)
+python38
+python37
+where YOUR_IMAGE_BUCKET_NAME is the name of your Cloud Storage bucket where you upload the images.
+
+Click Check my progress to verify the objective.
+
+Deploy the image processing function with a Cloud Storage trigger
+To deploy the text translation function with a Cloud Pub/Sub trigger, run the following command in the directory that contains the sample code:
+
+gcloud functions deploy ocr-translate \
+--runtime python39 \
+--trigger-topic YOUR_TRANSLATE_TOPIC_NAME \
+--entry-point translate_text \
+--set-env-vars "GCP_PROJECT=YOUR_GCP_PROJECT_ID,RESULT_TOPIC=YOUR_RESULT_TOPIC_NAME"
+Copied!
+Click Check my progress to verify the objective.
+
+Deploy the text translation function with a Cloud Pub/Sub trigger
+To deploy the function that saves results to Cloud Storage with a Cloud Pub/Sub trigger, run the following command in the directory that contains the sample code:
+
+gcloud functions deploy ocr-save \
+--runtime python39 \
+--trigger-topic YOUR_RESULT_TOPIC_NAME \
+--entry-point save_result \
+--set-env-vars "GCP_PROJECT=YOUR_GCP_PROJECT_ID,RESULT_BUCKET=YOUR_RESULT_BUCKET_NAME"
+Copied!
+Click Check my progress to verify the objective.
+
+Deploy the function that saves results to Cloud Storage with a Cloud Pub/Sub
+Task 5. Upload an image
+Upload an image to your image Cloud Storage bucket:
+
+gsutil cp PATH_TO_IMAGE gs://YOUR_IMAGE_BUCKET_NAME
+Copied!
+where
+
+PATH_TO_IMAGE is a path to an image file (that contains text) on your local system.
+YOUR_IMAGE_BUCKET_NAME is the name of the bucket where you are uploading images.
+You can download one of the images from the sample project.
+
+Watch the logs to be sure the executions have completed:
+
+gcloud functions logs read --limit 100
+Copied!
+You can view the saved translations in the Cloud Storage bucket you used for YOUR_RESULT_BUCKET_NAME.
+Click Check my progress to verify the objective.
+
+Upload an image to your image Cloud Storage bucket
+Task 6. Delete the Cloud Functions
+Deleting Cloud Functions does not remove any resources stored in Cloud Storage.
+
+To delete the Cloud Functions you created, run the following commands and follow the prompts:
+
+gcloud functions delete ocr-extract
+Copied!
+gcloud functions delete ocr-translate
+Copied!
+gcloud functions delete ocr-save
+Copied!
+You can also delete Cloud Functions from the Google Cloud.
+
+End your lab

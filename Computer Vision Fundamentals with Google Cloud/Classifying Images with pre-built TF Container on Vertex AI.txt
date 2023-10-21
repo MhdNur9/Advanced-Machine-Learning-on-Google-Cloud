@@ -1,0 +1,98 @@
+Learning objectives
+Understand how to build a Dense Neural Network (DNN) for image classification.
+
+Understand how to use dropout (DNN) for image classification.
+
+Understand how to use Convolutional Neural Networks (CNN).
+
+Know how to deploy and use an image classifcation model using Google Cloud's Vertex AI.
+
+Task 0. Setup and requirements
+For each lab, you get a new Google Cloud project and set of resources for a fixed time at no cost.
+
+Sign in to Qwiklabs using an incognito window.
+
+Note the lab's access time (for example, 1:15:00), and make sure you can finish within that time.
+There is no pause feature. You can restart if needed, but you have to start at the beginning.
+
+When ready, click Start lab.
+
+Note your lab credentials (Username and Password). You will use them to sign in to the Google Cloud Console.
+
+Click Open Google Console.
+
+Click Use another account and copy/paste credentials for this lab into the prompts.
+If you use other credentials, you'll receive errors or incur charges.
+
+Accept the terms and skip the recovery resource page.
+
+Note: Do not click End Lab unless you have finished the lab or want to restart it. This clears your work and removes the project.
+
+Enable the Notebooks API
+In the Google Cloud Console, on the Navigation menu_, click APIs & Services > Library.
+
+Search for Notebooks API and press ENTER.
+
+Click on the Notebooks API result, and if the API is not enabled, click Enable.
+
+Enable the Vertex AI API
+In the Google Cloud Console, on the Navigation menu, click Vertex AI > Dashboard.
+
+Click Enable Vertex AI API.
+
+Click Check my progress to verify the objective.
+Enable the Notebooks and Vertex AI APIs
+
+Task 1. Create a Cloud Storage bucket
+Navigate to Navigation menu > Cloud Storage in the Cloud console for your project, then click CREATE BUCKET.
+
+Set a unique name (use your project ID because it is unique) and then choose a regional bucket (For example set the region to us-central1). Then, click Create.
+
+Click Check my progress to verify the objective.
+Create a cloud storage bucket
+
+Task 2. Launch a Vertex AI Notebooks instance
+In the Google Cloud Console, on the Navigation Menu, click Vertex AI > Workbench. Select User-Managed Notebooks.
+
+On the Notebook instances page, click New Notebook > TensorFlow Enterprise > TensorFlow Enterprise 2.6 (with LTS) > Without GPUs.
+
+In the New notebook instance dialog, confirm the name of the deep learning VM, if you don’t want to change the region and zone, leave all settings as they are and then click Create. The new VM will take 2-3 minutes to start.
+
+Click Open JupyterLab.
+A JupyterLab window will open in a new tab.
+
+You will see “Build recommended” pop up, click Build. If you see the build failed, ignore it.
+
+Click Check my progress to verify the objective.
+Create Vertex AI Platform Notebooks instance
+
+Task 3. Clone a course repo within your Vertex AI Notebooks instance
+To clone the training-data-analyst notebook in your JupyterLab instance:
+
+In JupyterLab, to open a new terminal, click the Terminal icon.
+
+At the command-line prompt, run the following command:
+
+git clone https://github.com/GoogleCloudPlatform/training-data-analyst
+Copied!
+To confirm that you have cloned the repository, double-click on the training-data-analyst directory and ensure that you can see its contents.
+The files for all the Jupyter notebook-based labs throughout this course are available in this directory.
+
+Click Check my progress to verify the objective.
+Clone course repo within your Vertex AI Platform Notebooks instance
+
+Task 4. Classify images with pre-built TF container on Vertex AI
+In the notebook interface, navigate to training-data-analyst > courses > machine_learning > deepdive2 > computer_vision_fun > labs and open classifying_images_with_pre-built_tf_container_on_vertex_ai.ipynb.
+
+In the notebook interface, click Edit > Clear All Outputs.
+
+Carefully read through the notebook instructions and fill in lines marked with #TODO where you need to complete the code.
+
+Tip: To run the current cell, click the cell and press SHIFT+ENTER. Other cell commands are listed in the notebook UI under Run.
+
+Hints may also be provided for the tasks to guide you. Highlight the text to read the hints, which are in white text.
+To view the complete solution, navigate to training-data-analyst > courses > machine_learning > deepdive2 > computer_vision_fun > solutions, and open classifying_images_with_pre-built_tf_container_on_vertex_ai.ipynb.
+Click Check my progress to verify the objective.
+Classify images with pre-built TF container on Vertex AI
+
+End your lab
