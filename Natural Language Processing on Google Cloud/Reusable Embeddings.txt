@@ -1,0 +1,81 @@
+Learning objectives
+In this lab, you learn how to:
+
+Use pre-trained TF Hub text modules to generate sentence vectors.
+Incorporate a pre-trained TF-Hub module into a Keras model.
+Deploy and use a text model on CAIP.
+Setup and requirements
+For each lab, you get a new Google Cloud project and set of resources for a fixed time at no cost.
+
+Sign in to Qwiklabs using an incognito window.
+
+Note the lab's access time (for example, 1:15:00), and make sure you can finish within that time.
+There is no pause feature. You can restart if needed, but you have to start at the beginning.
+
+When ready, click Start lab.
+
+Note your lab credentials (Username and Password). You will use them to sign in to the Google Cloud Console.
+
+Click Open Google Console.
+
+Click Use another account and copy/paste credentials for this lab into the prompts.
+If you use other credentials, you'll receive errors or incur charges.
+
+Accept the terms and skip the recovery resource page.
+
+Note: Do not click End Lab unless you have finished the lab or want to restart it. This clears your work and removes the project.
+
+Enable the AI Platform Training & Prediction API and Vertex AI API
+On the Navigation menu, navigate to APIs & services > Library and search for AI Platform Training & Prediction API in the search box.
+Click on AI Platform Training & Prediction API, then click Enable.
+Then, search for Vertex AI API in the search box.
+Click on Vertex AI API, then click Enable.
+Task 1. Create a Cloud Storage bucket
+On the Navigation menu, navigate to Cloud Storage and Click on Create bucket.
+Set a unique name (use your project ID because it is unique). Then, click Create.
+Task 2. Launch Vertex AI Notebooks
+To create and launch a Vertex AI Workbench notebook:
+
+In the Navigation Menu Navigation menu icon, click Vertex AI > Workbench.
+
+On the User-Managed Notebook page, click Enable Notebooks API (if it isn't enabled yet), then click Create New.
+
+In the New instance menu, choose the latest version of TensorFlow Enterprise 2.6 (with LTS) in Environment.
+
+Name the notebook.
+
+Set Region to and Zone to any zone within the designated region.
+
+Leave the remaining fields at their default and click Create.
+
+After a few minutes, the Workbench page lists your instance, followed by Open JupyterLab.
+
+Click Open JupyterLab to open JupyterLab in a new tab. If you get a message saying beatrix jupyterlab needs to be included in the build, just ignore it.
+
+You will see “Build recommended” pop up, click Build. If you see the build failed, ignore it.
+
+Task 3. Clone course repo within your Vertex AI Notebooks instance
+To clone the training-data-analyst notebook in your JupyterLab instance:
+
+In JupyterLab, to open a new terminal, click the Terminal icon.
+
+At the command-line prompt, run the following command:
+
+git clone https://github.com/GoogleCloudPlatform/training-data-analyst
+Copied!
+To confirm that you have cloned the repository, double-click on the training-data-analyst directory and ensure that you can see its contents.
+The files for all the Jupyter notebook-based labs throughout this course are available in this directory.
+
+Task 4. Classify text using reusable embeddings
+Duration is 60 min
+
+In the notebook interface, navigate to training-data-analyst > courses > machine_learning > deepdive2 > text_classification > labs > reusable_embeddings.ipynb.
+
+In the notebook interface, click on Edit > Clear All Outputs (click on Edit, then in the drop-down menu, select Clear All Outputs).
+
+Carefully read through the notebook instructions and fill in lines marked with #TODO where you need to complete the code as needed
+
+Tip: To run the current cell, click the cell and press SHIFT+ENTER. Other cell commands are listed in the notebook UI under Run.
+
+Hints may also be provided for the tasks to guide you along. Highlight the text to read the hints (they are in white text).
+If you need more help, you may take a look at the complete solution by navigating to training-data-analyst > courses > machine_learning > deepdive2 > text_classification > solutions and opening reusable_embeddings.ipynb.

@@ -1,0 +1,74 @@
+Learning objectives
+In this lab, you will:
+
+Learn how to tokenize and integerize a corpus of text for training in Keras
+
+Learn how to do one-hot-encodings in Keras
+
+Learn how to use embedding layers to represent words in Keras
+
+Learn about the bag-of-word representation for sentences
+
+Learn how to use DNN/CNN/RNN model to classify text in keras
+
+Setup and requirements
+For each lab, you get a new Google Cloud project and set of resources for a fixed time at no cost.
+
+Sign in to Qwiklabs using an incognito window.
+
+Note the lab's access time (for example, 1:15:00), and make sure you can finish within that time.
+There is no pause feature. You can restart if needed, but you have to start at the beginning.
+
+When ready, click Start lab.
+
+Note your lab credentials (Username and Password). You will use them to sign in to the Google Cloud Console.
+
+Click Open Google Console.
+
+Click Use another account and copy/paste credentials for this lab into the prompts.
+If you use other credentials, you'll receive errors or incur charges.
+
+Accept the terms and skip the recovery resource page.
+
+Note: Do not click End Lab unless you have finished the lab or want to restart it. This clears your work and removes the project.
+
+Enable the Vertex AI API
+In the Google Cloud Console, on the Navigation menu, click Vertex AI > Dashboard, and click Enable Vertex AI API.
+
+Task 1. Launch Vertex AI Notebooks
+In the Google Cloud Console, on the Navigation Menu, click Vertex AI > Workbench. Select User-Managed Notebooks.
+
+On the Notebook instances page, click New Notebook > TensorFlow Enterprise > TensorFlow Enterprise 2.6 (with LTS) > Without GPUs.
+
+In the New notebook instance dialog, confirm the name of the deep learning VM, if you don’t want to change the region and zone, leave all settings as they are and then click Create. The new VM will take 2-3 minutes to start.
+
+Click Open JupyterLab.
+A JupyterLab window will open in a new tab.
+
+You will see “Build recommended” pop up, click Build. If you see the build failed, ignore it.
+
+Task 2. Clone course repo within your Vertex AI Notebooks instance
+To clone the training-data-analyst notebook in your JupyterLab instance:
+
+In JupyterLab, to open a new terminal, click the Terminal icon.
+
+At the command-line prompt, run the following command:
+
+git clone https://github.com/GoogleCloudPlatform/training-data-analyst
+Copied!
+To confirm that you have cloned the repository, double-click on the training-data-analyst directory and ensure that you can see its contents.
+The files for all the Jupyter notebook-based labs throughout this course are available in this directory.
+
+Task 3. Keras for text classification using Vertex AI
+Duration is 60 min
+
+In the notebook interface, navigate to training-data-analyst > courses > machine_learning > deepdive2 > text_classification > labs > keras_for_text_classification.ipynb.
+
+In the notebook interface, click on Edit > Clear All Outputs.
+
+Carefully read through the notebook instructions and fill in lines marked with #TODO where you need to complete the code.
+
+Tip: To run the current cell, click the cell and press SHIFT+ENTER. Other cell commands are listed in the notebook UI under Run.
+
+Hints may also be provided for the tasks to guide you along. Highlight the text to read the hints (they are in white text).
+To see the complete solution, navigate to training-data-analyst > courses > machine_learning > deepdive2 > text_classification > solutions and open keras_for_text_classification.ipynb.
