@@ -1,0 +1,79 @@
+Learning objectives
+You learn how to:
+
+Review TFDV methods.
+
+Generate statistics.
+
+Visualize statistics.
+
+Infer a schema.
+
+Update a schema.
+
+Setup
+For each lab, you get a new Google Cloud project and set of resources for a fixed time at no cost.
+
+Sign in to Qwiklabs using an incognito window.
+
+Note the lab's access time (for example, 1:15:00), and make sure you can finish within that time.
+There is no pause feature. You can restart if needed, but you have to start at the beginning.
+
+When ready, click Start lab.
+
+Note your lab credentials (Username and Password). You will use them to sign in to the Google Cloud Console.
+
+Click Open Google Console.
+
+Click Use another account and copy/paste credentials for this lab into the prompts.
+If you use other credentials, you'll receive errors or incur charges.
+
+Accept the terms and skip the recovery resource page.
+
+Note: Do not click End Lab unless you have finished the lab or want to restart it. This clears your work and removes the project.
+
+Task 1. Set up your environment
+Enable the Recommended APIs
+In the Google Cloud Console, on the Navigation menu, click Vertex AI.
+
+Click Enable All Recommended API.
+
+Task 2. Launch Vertex AI notebooks
+In the Google Cloud Console, on the Navigation Menu, click Vertex AI > Workbench. Select User-Managed Notebooks.
+
+On the Notebook instances page, click Create Notebook.
+
+In the Create instance dialog, confirm the name of the deep learning VM, if you don’t want to change the region and zone, leave it to default.
+
+Click Environment, and select TensorFlow Enterprise 2.6 (with LTS and Intel MKL-DNN/MKL) from the dropdown.
+
+Click Machine type, and select E2 standard > e2-standard-2.
+
+Leave all settings as they are and then click Create. The new VM will take 2-3 minutes to start.
+
+Click Open JupyterLab.
+A JupyterLab window will open in a new tab.
+
+Task 3. Clone course repo within your Vertex AI notebooks instance
+To clone the training-data-analyst notebook in your JupyterLab instance:
+
+In JupyterLab, to open a new terminal, click the Terminal icon.
+
+At the command-line prompt, run the following command:
+
+git clone https://github.com/GoogleCloudPlatform/training-data-analyst
+Copied!
+To confirm that you have cloned the repository, double-click on the training-data-analyst directory and ensure that you can see its contents.
+The files for all the Jupyter notebook-based labs throughout this course are available in this directory.
+
+Task 4. Introduction to TensorFlow data validation
+In the notebook interface, navigate to training-data-analyst > courses > machine_learning > deepdive2 > production_ml > labs, and open tfdv_basic_spending.ipynb.
+
+In the notebook interface, click Edit > Clear All Outputs.
+
+Carefully read through the notebook instructions and fill in lines marked with #TODO where you need to complete the code.
+
+Tip: To run the current cell, click the cell and press SHIFT+ENTER. Other cell commands are listed in the notebook UI under Run.
+
+Hints may also be provided for the tasks to guide you along. Highlight the text to read the hints (they are in white text).
+If you need more help, look at the complete solution at training-data-analyst > courses > machine_learning > deepdive2 > production_ml > solutions and open tfdv_basic_spending.ipynb.
